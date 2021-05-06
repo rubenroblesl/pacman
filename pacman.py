@@ -1,30 +1,35 @@
-"""Pacman, classic arcade game.
+# Rubén A. Robles Leal A00828606
+# Alejandro Medrano Torres A00831829
+# Reflexion –
+# Fecha 6 de Mayo
 
-Exercises
-
-1. Change the board.
-2. Change the number of ghosts.
-3. Change where pacman starts.
-4. Make the ghosts faster/slower.
-5. Make the ghosts smarter.
-
-"""
-
+# Se importan las librerias
 from random import choice
 from turtle import *
 from freegames import floor, vector
 
+# Se almacena el score que lleva
 state = {'score': 0}
+
+# Hace invisible la direccion
 path = Turtle(visible=False)
 writer = Turtle(visible=False)
+
+# Direccion del pacman
 aim = vector(5, 0)
+
+# Crea pacman en la posicion (-40, -80)
 pacman = vector(-40, -80)
+
+#Lista de listas posicion y direccion de cada fantasma
 ghosts = [
     [vector(-180, 160), vector(5, 0)],
     [vector(-180, -160), vector(0, 5)],
     [vector(100, 160), vector(0, -5)],
     [vector(100, -160), vector(-5, 0)],
 ]
+
+#tablero (0 son negros, 1 son espacios)
 tiles = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
@@ -48,6 +53,7 @@ tiles = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ]
 
+# Dibuja un square con su esq. inf. izq en (x,y)
 def square(x, y):
     "Draw square using path at (x, y)."
     path.up()
@@ -103,7 +109,8 @@ def world():
 def move():
     "Move pacman and all ghosts."
     writer.undo()
-    writer.write(state['score'])
+    valor = state['score']
+    writer.write(f'Score: {valor}')
 
     clear()
 
@@ -120,9 +127,12 @@ def move():
         square(x, y)
 
     up()
+    # se va a la posicion del pacman
     goto(pacman.x + 10, pacman.y + 10)
+    # 1era vez que dibuja el pacman
     dot(20, 'yellow')
-
+    
+    
     for point, course in ghosts:
         if valid(point + course):
             point.move(course)
@@ -139,14 +149,18 @@ def move():
 
         up()
         goto(point.x + 10, point.y + 10)
-        dot(20, 'red')
+        dot(15, colores[k])
+        # actualizar pos para nuevo fantasma
+        k = k + 1
 
     update()
 
     for point, course in ghosts:
         if abs(pacman - point) < 20:
+            writer.goto(-120,10)
+            writer.write('GAME OVER', font=('Arial', 30, 'normal'))
             return
-
+    # vuelve a llamar a la función dentro de 100 ms
     ontimer(move, 100)
 
 def change(x, y):
@@ -157,6 +171,8 @@ def change(x, y):
 
 setup(420, 420, 370, 0)
 hideturtle()
+
+
 tracer(False)
 writer.goto(160, 160)
 writer.color('white')
