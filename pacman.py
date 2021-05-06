@@ -112,7 +112,8 @@ def move():
     colores = ['red','green','brown','white']
     "Move pacman and all ghosts."
     writer.undo()
-    writer.write(state['score'])
+    valor = state['score']
+    writer.write(f'Score: {valor}')
 #limpia la ventana
     clear()
 #si no es pared ejecuta pacman.move()
