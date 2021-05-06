@@ -1,6 +1,6 @@
 # Rubén A. Robles Leal A00828606
 # Alejandro Medrano Torres A00831829
-# Reflexion –
+# Reflexion en README
 # Fecha 6 de Mayo
 
 # Se importan las librerias
@@ -19,13 +19,13 @@ writer = Turtle(visible=False)
 aim = vector(5, 0)
 
 # Crea pacman en la posicion (-40, -80)
-pacman = vector(-40, -80)
+pacman = vector(-40, -100)
 
 #Lista de listas posicion y direccion de cada fantasma
 ghosts = [
-    [vector(-180, 160), vector(5, 0)],
+    [vector(-180, 140), vector(5, 0)],
     [vector(-180, -160), vector(0, 5)],
-    [vector(100, 160), vector(0, -5)],
+    [vector(100, 140), vector(0, -5)],
     [vector(100, -160), vector(-5, 0)],
 ]
 
@@ -53,7 +53,6 @@ tiles = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ]
-
 #dibuja un square con su esq. inf. izq en (x,y)
 def square(x, y):
     "Draw square using path at (x, y)."
@@ -92,7 +91,7 @@ def valid(point):
 def world():
     "Draw world using path."
     bgcolor('black')
-    path.color('blue')
+    path.color('purple')
 
     for index in range(len(tiles)):
         tile = tiles[index]
@@ -144,36 +143,23 @@ def move():
         #valida si el fantasma point se puede mover en course
         # si fantasma y pacman estan en la misma X
         
+        # para no esperar hasta que choque
+        if (valid(point + course) and point.y != pacman.y and point.x != pacman.x):
+            point.move(course)
+        
     # ------------MOVIMIENTO EN X INTELIGENTE-------------
-        if (point.y == pacman.y):
-            #Si fantasma esta derecha
+        elif (point.y == pacman.y):
+            #Si fantasma esta arriba
             if point.x > pacman.x:
-                #si se puede ir a la izq
+                #si se puede ir abajo
                 if valid(point + vector(-5,0)):
-                    point.move(vector(-5,0))
-                    plan = vector(-5,0)
-                elif valid(point + course):
-                    point.move(course)
-                else: #si no se puede mover el fantasma en esa dirrección 
-                    options = [
-                        vector(5, 0),
-                        vector(-5, 0),
-                        vector(0, 5),
-                        vector(0, -5),
-                    ]
+                    course.x = -5
+                    course.y = 0
+            #si esta abajo        
             else:
                 if valid(point + vector(5,0)):
-                    point.move(vector(5,0))
-                    plan = vector(5,0)
-                elif valid(point + course):
-                    point.move(course)
-                else: #si no se puede mover el fantasma en esa dirrección 
-                    options = [
-                        vector(5, 0),
-                        vector(-5, 0),
-                        vector(0, 5),
-                        vector(0, -5),
-                    ]
+                    course.x = 5
+                    course.y = 0
                     
     # ------------MOVIMIENTO EN Y INTELIGENTE-------------
         elif (point.x == pacman.x):
@@ -181,48 +167,31 @@ def move():
             if point.y > pacman.y:
                 #si se puede ir abajo
                 if valid(point + vector(0,-5)):
-                    point.move(vector(0,-5))
-                    plan = vector(0,-5)
-                elif valid(point + course):
-                    point.move(course)
-                else: #si no se puede mover el fantasma en esa dirrección 
-                    options = [
-                        vector(5, 0),
-                        vector(-5, 0),
-                        vector(0, 5),
-                        vector(0, -5),
-                    ]
+                    course.x = 0
+                    course.y = -5
+            #si esta abajo        
             else:
                 if valid(point + vector(0,5)):
-                    point.move(vector(0,5))
-                    plan = vector(0,5)
-                elif valid(point + course):
-                    point.move(course)
-                else: #si no se puede mover el fantasma en esa dirrección 
-                    options = [
-                        vector(5, 0),
-                        vector(-5, 0),
-                        vector(0, 5),
-                        vector(0, -5),
-                    ]
-                
-                
+                    course.x = 0
+                    course.y = 5
+                        
 # -------------------------- SI NO ESTA NI EN MISMA X NI EN MISMA Y -------------------------
         else:
-            if valid(point + course):
-                point.move(course)
-            else: #si no se puede mover el fantasma en esa dirrección 
-                options = [
-                    vector(5, 0),
-                    vector(-5, 0),
-                    vector(0, 5),
-                    vector(0, -5),
-                ]
-                #plan guarda la nueva dirrección del fantasma
-                #ESTO SE DEBE DE MODIFICAR PARA HACER FANTASMAS MÁS LISTOS
-                plan = choice(options)
-                course.x = plan.x
-                course.y = plan.y
+            options = [
+                vector(5, 0),
+                vector(-5, 0),
+                vector(0, 5),
+                vector(0, -5),
+            ]
+            #plan guarda la nueva dirrección del fantasma
+            #ESTO SE DEBE DE MODIFICAR PARA HACER FANTASMAS MÁS LISTOS
+            plan = choice(options)
+            course.x = plan.x
+            course.y = plan.y
+            
+        # para no esperar hasta que choque
+        if (valid(point + course) and (point.y == pacman.y or point.x == pacman.x)):
+            point.move(course)
 #levanta
         up()
         #mueve a la posicion del fantasma
