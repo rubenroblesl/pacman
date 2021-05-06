@@ -53,7 +53,7 @@ tiles = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ]
 
-# Dibuja un square con su esq. inf. izq en (x,y)
+#dibuja un square con su esq. inf. izq en (x,y)
 def square(x, y):
     "Draw square using path at (x, y)."
     path.up()
@@ -66,18 +66,18 @@ def square(x, y):
         path.left(90)
 
     path.end_fill()
-
+#
 def offset(point):
     "Return offset of point in tiles."
     x = (floor(point.x, 20) + 200) / 20
     y = (180 - floor(point.y, 20)) / 20
     index = int(x + y * 20)
     return index
-
+#retornar True si point es un title valido
 def valid(point):
     "Return True if point is valid in tiles."
     index = offset(point)
-
+#si la celda es 0 retorna False - pared 
     if tiles[index] == 0:
         return False
 
@@ -85,7 +85,7 @@ def valid(point):
 
     if tiles[index] == 0:
         return False
-
+#retorar True 
     return point.x % 20 == 0 or point.y % 20 == 0
 
 def world():
@@ -95,72 +95,82 @@ def world():
 
     for index in range(len(tiles)):
         tile = tiles[index]
-
+# si el valor es 1
         if tile > 0:
-            x = (index % 20) * 20 - 200
-            y = 180 - (index // 20) * 20
-            square(x, y)
-
+            #calcula la x,y donde se  dibuja el square
+            x = (index % 20) * 20 - 200 #(21%20)*20-200=180
+            y = 180 - (index // 20) * 20 #180-(21//20)*20=160
+            square(x, y) #dibuja el square (-180,160)(-160,160)
+#dibuja la menta sobre el square
             if tile == 1:
                 path.up()
                 path.goto(x + 10, y + 10)
                 path.dot(2, 'white')
 
 def move():
+    #lista de colores
+    colores = ['red','green','brown','white']
     "Move pacman and all ghosts."
     writer.undo()
-    valor = state['score']
-    writer.write(f'Score: {valor}')
-
+    writer.write(state['score'])
+#limpia la ventana
     clear()
-
+#si no es pared ejecuta pacman.move()
     if valid(pacman + aim):
         pacman.move(aim)
-
+#retorna la posición del pacman en el tablero
     index = offset(pacman)
-
+#1 significa camino
     if tiles[index] == 1:
+        # a esa posicion le asigna un 2 significa que ya no hay menta ahi
         tiles[index] = 2
+        #se incrementa el score
         state['score'] += 1
+        #calcula la posición x,y del pacman
         x = (index % 20) * 20 - 200
         y = 180 - (index // 20) * 20
+        #dibujar el square sin la menta
         square(x, y)
 
     up()
-    # se va a la posicion del pacman
+    #se va a la poscicion del pacman
     goto(pacman.x + 10, pacman.y + 10)
-    # 1era vez que dibuja el pacman
+    #dibuja el pacman
     dot(20, 'yellow')
-    
-    
+#[vector(-180, 160), vector(5, 0)],
+    k = 0
     for point, course in ghosts:
+        #valida si el fantasma poin se puede mover en course
         if valid(point + course):
             point.move(course)
-        else:
+        else: #si no se puede mover el fantasma en esa dirrección 
             options = [
                 vector(5, 0),
                 vector(-5, 0),
                 vector(0, 5),
                 vector(0, -5),
             ]
+            #plan guarda la nueva dirrección del fantasma
+            #ESTO SE DEBE DE MODIFICAR PARA HACER FANTASMAS MÁS LISTOS
             plan = choice(options)
             course.x = plan.x
             course.y = plan.y
-
+#levanta
         up()
+        #mueve a la posicion del fantasma
         goto(point.x + 10, point.y + 10)
-        dot(15, colores[k])
-        # actualizar pos para nuevo fantasma
-        k = k + 1
+        #dibuja el fantasma
+        dot(20, colores[k])#'red')}
+        k = k +1
 
     update()
-
+#recorre la lista de fantasmas para ver si coinciden las posiciones del pacman o un fantasma
     for point, course in ghosts:
         if abs(pacman - point) < 20:
             writer.goto(-120,10)
-            writer.write('GAME OVER', font=('Arial', 30, 'normal'))
+            writer.write('GAME OVER',font=('Arial',30,'normal'))
             return
-    # vuelve a llamar a la función dentro de 100 ms
+
     ontimer(move, 100)
 
 def change(x, y):
@@ -169,19 +179,30 @@ def change(x, y):
         aim.x = x
         aim.y = y
 
-setup(420, 420, 370, 0)
+
+#tamaño de la ventana ancho y alto 420,420
+#0,0 indica la posicion de la esquina sup. izq. de la ventana 
+setup(420, 420, 0, 0)
+# esconde la flecha de la turtle default
 hideturtle()
-
-
+#oculta toda forma de dibujar
 tracer(False)
+#mueve la turtle writer a la posicion 160,160
 writer.goto(160, 160)
 writer.color('white')
 writer.write(state['score'])
+#activar los eventos del teclado 
 listen()
+#en caso de que el usuario oprima la indicación
+#llama a la funcion change con los argumentos indicados
+#que indican la nueva dirrección del pacman
 onkey(lambda: change(5, 0), 'Right')
 onkey(lambda: change(-5, 0), 'Left')
 onkey(lambda: change(0, 5), 'Up')
 onkey(lambda: change(0, -5), 'Down')
+#llama a la función world - dibuja el tablero
 world()
+#llama a la función move()
 move()
+#entra en un loop
 done()
